@@ -8,6 +8,20 @@ var app = (function () {
     }
     
     var stompClient = null;
+    var topic;
+
+    var setTopic = function(number){
+        topic = number;
+        connectAndSubscribe();
+        clearCanvas();
+    }
+
+    var clearCanvas = function(){
+        const c = document.getElementById("myCanvas");
+        const ctx = c.getContext("2d");
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.beginPath();
+    };
 
     var initCanvas = function(){
         var c = document.getElementById("canvas");
@@ -53,7 +67,7 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint', function (eventbody) {
+            stompClient.subscribe('/topic/newpoint.' + topic, function (eventbody) {
                 var theObject=JSON.parse(eventbody.body);
                 addPointToCanvas(theObject);
             });
@@ -67,7 +81,7 @@ var app = (function () {
         //addPointToCanvas(pt);
 
         //publicar el evento
-        stompClient.send("/topic/newpoint", {}, JSON.stringify(pt));
+        stompClient.send("/topic/newpoint." + topic, {}, JSON.stringify(pt));
     }
 
     return {
@@ -80,6 +94,8 @@ var app = (function () {
         },
 
         publishPoint,
+        connectAndSubscribe,
+        setTopic,
 
         disconnect: function () {
             if (stompClient !== null) {
