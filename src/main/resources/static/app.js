@@ -9,15 +9,27 @@ var app = (function () {
     
     var stompClient = null;
     var topic;
+    var subscribesPoint = null;
+    var subscribesPolygon = null;
+    var polygon = {points : []};
+
+    var getTopic = function(){
+        return topic;
+    }
 
     var setTopic = function(number){
+        if (subscribesPoint != null){
+            subscribesPoint.unsubscribe();
+            subscribesPolygon.unsubscribe();
+        }
+        polygon = {points : []};
         topic = number;
         connectAndSubscribe();
         clearCanvas();
     }
 
     var clearCanvas = function(){
-        const c = document.getElementById("myCanvas");
+        const c = document.getElementById("canvas");
         const ctx = c.getContext("2d");
         ctx.clearRect(0, 0, c.width, c.height);
         ctx.beginPath();
@@ -29,12 +41,14 @@ var app = (function () {
         if(window.PointerEvent) {
             c.addEventListener("pointerdown", function(event){
                 var point = getMousePosition(event);
+                polygon.points.push(point);
                 publishPoint(point.x, point.y);
             });
         }
         else {
             c.addEventListener("mousedown", function(event){
                 var point = getMousePosition(event);
+                polygon.points.push(point);
                 publishPoint(point.x, point.y);
             });
         }
@@ -46,6 +60,21 @@ var app = (function () {
         ctx.beginPath();
         ctx.arc(point.x, point.y, 1, 0, 2 * Math.PI);
         ctx.stroke();
+    };
+
+    var addPolygonToCanvas = function (points) {
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = '#f00';
+        console.log(points);
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (var i = 1; i < points.length ; i++){
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.stroke();
+        ctx.closePath();
+        ctx.fill();
     };
     
     
@@ -67,9 +96,15 @@ var app = (function () {
         //subscribe to /topic/TOPICXX when connections succeed
         stompClient.connect({}, function (frame) {
             console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/newpoint.' + topic, function (eventbody) {
+            subscribesPoint = stompClient.subscribe('/topic/newpoint.' + topic, function (eventbody) {
                 var theObject=JSON.parse(eventbody.body);
                 addPointToCanvas(theObject);
+            });
+
+            subscribesPolygon = stompClient.subscribe('/topic/newpolygon.' + topic, function (eventbody) {
+                var theObject=JSON.parse(eventbody.body);
+                console.log(theObject);
+                addPolygonToCanvas(theObject);
             });
         });
 
@@ -81,7 +116,7 @@ var app = (function () {
         //addPointToCanvas(pt);
 
         //publicar el evento
-        stompClient.send("/topic/newpoint." + topic, {}, JSON.stringify(pt));
+        stompClient.send("/app/newpoint." + topic, {}, JSON.stringify(pt));
     }
 
     return {
@@ -96,6 +131,7 @@ var app = (function () {
         publishPoint,
         connectAndSubscribe,
         setTopic,
+        getTopic,
 
         disconnect: function () {
             if (stompClient !== null) {
