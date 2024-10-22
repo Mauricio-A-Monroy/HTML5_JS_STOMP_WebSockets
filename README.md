@@ -125,6 +125,21 @@ Para ver cómo manejar esto desde el manejador de eventos STOMP del servidor, re
 
 2. Ajuste su cliente para que, en lugar de publicar los puntos en el tópico /topic/newpoint.{numdibujo}, lo haga en /app/newpoint.{numdibujo}. Ejecute de nuevo la aplicación y rectifique que funcione igual, pero ahora mostrando en el servidor los detalles de los puntos recibidos.
 
+
+![image](https://github.com/user-attachments/assets/41f31a16-7d89-4a1c-8308-ca5d1ea17db8)
+![image](https://github.com/user-attachments/assets/9b832fd2-4fcd-4c35-8f1a-266c481de4ac)
+
+``` java
+	var publishPoint = function(px,py){
+        var pt=new Point(px,py);
+        console.info("publishing point at "+pt);
+        //addPointToCanvas(pt);
+
+        //publicar el evento
+        stompClient.send("/app/newpoint." + topic, {}, JSON.stringify(pt));
+    }
+```
+
 3. Una vez rectificado el funcionamiento, se quiere aprovechar este 'interceptor' de eventos para cambiar ligeramente la funcionalidad:
 
 	1. Se va a manejar un nuevo tópico llamado '/topic/newpolygon.{numdibujo}', en donde el lugar de puntos, se recibirán objetos javascript que tengan como propiedad un conjunto de puntos.
