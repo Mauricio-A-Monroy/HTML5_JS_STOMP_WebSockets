@@ -33,10 +33,10 @@ public class STOMPMessagesHandler {
             draws.put(numdibujo, arrayList);
         }
 
-        if (draws.get(numdibujo).size() < 3) {
-            msgt.convertAndSend("/topic/newpoint." + numdibujo, pt);
-        } else {
+        msgt.convertAndSend("/topic/newpoint." + numdibujo, pt);
+        if (draws.get(numdibujo).size() >= 4){
             msgt.convertAndSend("/topic/newpolygon." + numdibujo, draws.get(numdibujo));
+            draws.put(numdibujo, new ArrayList<>());
         }
 
     }

@@ -8,7 +8,7 @@ var app = (function () {
     }
     
     var stompClient = null;
-    var topic;
+    var topic = null;
     var subscribesPoint = null;
     var subscribesPolygon = null;
     var polygon = {points : []};
@@ -40,16 +40,26 @@ var app = (function () {
         var ctx = c.getContext("2d");
         if(window.PointerEvent) {
             c.addEventListener("pointerdown", function(event){
-                var point = getMousePosition(event);
-                polygon.points.push(point);
-                publishPoint(point.x, point.y);
+                if(topic == null){
+                    alert("Conéctese a un dibujo.");
+                }
+                else{
+                    var point = getMousePosition(event);
+                    polygon.points.push(point);
+                    publishPoint(point.x, point.y);
+                }
             });
         }
         else {
             c.addEventListener("mousedown", function(event){
-                var point = getMousePosition(event);
-                polygon.points.push(point);
-                publishPoint(point.x, point.y);
+                if(topic == null){
+                    alert("Conéctese a un dibujo.");
+                }
+                else{
+                    var point = getMousePosition(event);
+                    polygon.points.push(point);
+                    publishPoint(point.x, point.y);
+                }
             });
         }
     };
