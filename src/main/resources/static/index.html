@@ -21,21 +21,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="/webjars/jquery/jquery.min.js"></script>
+        <script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
         <script src="/webjars/sockjs-client/sockjs.min.js"></script>
         <script src="/webjars/stomp-websocket/stomp.min.js"></script>
         <script src="/app.js"></script>
+        <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="styles.css">
+        <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;700&display=swap" rel="stylesheet">
 
     </head>
     
     <body onload="app.init()">
-        Dibujo:<input id="topic" type="number"/>
-        <button onclick="app.setTopic($('#topic').val())">Conectarse</button>
+        <div class="grid-container">
+            <div class="connection">
+                <label class="connection-label">Draw: <input id="topic" class="styled-input" type="number"/></label>
+                <button class="styled-button" onclick="app.setTopic($('#topic').val())">Connect</button>
+            </div>
 
-        X:<input id="x" type="number"/>
-        Y:<input id="y" type="number"/>        
-        <button onclick="app.publishPoint($('#x').val(),$('#y').val())">Send point</button>
+            <div class="coordinates">
+                <label class="coord-label">X: </label><input id="x" class="styled-input" type="number"/>
+                <label class="coord-label">Y: </label><input id="y" class="styled-input" type="number"/>
+                <button class="styled-button" onclick="app.publishPoint($('#x').val(),$('#y').val())">Send point</button>
+            </div>
 
+            <canvas id="canvas" width="800" height="600" style="border:1px solid #d3d3d3;"></canvas>
 
-        <canvas id="canvas" width="800" height="600" style="border:1px solid #d3d3d3;"></canvas>
+        </div>
     </body>
 </html>
